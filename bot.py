@@ -1,3 +1,5 @@
+import sqlite3
+
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import ReplyKeyboardRemove, InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton
 from aiogram.dispatcher import FSMContext
@@ -5,10 +7,8 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher.filters import Text
 
-import sqlite3
+from config import TOKEN
 
-TOKEN = ''
-ADMINS = []
 
 bot = Bot(TOKEN, parse_mode='HTML')
 dp = Dispatcher(bot, storage=MemoryStorage())
