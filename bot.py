@@ -7,8 +7,8 @@ from aiogram.dispatcher.filters import Text
 
 import sqlite3
 
-TOKEN = '6248858125:AAGllyux4PvA53NssEckgFJ4oYJNtLcUBg8'
-ADMINS = [387605921]
+TOKEN = ''
+ADMINS = []
 
 bot = Bot(TOKEN, parse_mode='HTML')
 dp = Dispatcher(bot, storage=MemoryStorage())
