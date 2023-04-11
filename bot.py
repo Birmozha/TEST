@@ -66,7 +66,7 @@ async def start(message: types.Message):
 
 # ОБРАБОТЧИК INLINE-КНОПОК 
 @dp.callback_query_handler()
-async def dialog(callback: types.CallbackQuery):
+async def dialog(callback: types.CallbackQuery, state: FSMContext):
     await callback.answer()
     with sqlite3.connect('data.db') as db:
         cur = db.cursor()
@@ -82,6 +82,7 @@ async def dialog(callback: types.CallbackQuery):
         bid = cur.execute(
             """SELECT qid, properties FROM TREE WHERE pid IS (?) AND properties LIKE '<button%' """, (qid, )
             ).fetchall()
+        print(bid)
         ikbs = []
         kbs = []
         for id, prop in bid:
@@ -90,13 +91,16 @@ async def dialog(callback: types.CallbackQuery):
                 ikbs.append(cur.execute(
                     """SELECT text, qid FROM data WHERE qid IS (?) """, (id, )
                     ).fetchone())
+                print(ikbs)
             # СОЗДАНИЕ СПИСКА ОБЫЧНЫХ КНОПОК
             else:
                 kbs.append(cur.execute(
                     """SELECT text FROM data WHERE qid IS (?) """, (id, )
                     ).fetchone())
     
+    
     if ikbs:
+        print(ikbs)
         buttonsText = [button for button in ikbs] # СОЗДАНИЕ СПИСКА ТИПА [('Text', ID), ('Text', ID), ...]
         # СОЗДАНИЕ КЛАВИАТУРЫ
         kb = InlineKeyboardMarkup(row_width=1
@@ -116,10 +120,15 @@ async def dialog(callback: types.CallbackQuery):
     else:
         # ОТПРАВКА СООБЩЕНИЯ БОТОМ, ЕСЛИ КНОПОК НЕТ
         await callback.message.answer(text=text)
+    async with state.proxy() as st:
+        st['prev'] = qid
 
 # ОБРАБОТЧИК ТЕКСТОВОГО СООБЩЕНИЯ
 @dp.message_handler()
-async def dialog(message: types.Message):
+async def dialog(message: types.Message, state: FSMContext):
+    async with state.proxy() as st:
+        print(st['prev'])
+
     with sqlite3.connect('data.db') as db:
         cur = db.cursor()
         # НАХОЖДЕНИЕ ID ПОЛУЧЕННОГО ТЕКСТОВОГО СООБЩЕНИЯ (ВОПРОСА)
